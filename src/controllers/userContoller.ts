@@ -30,20 +30,6 @@ export async function getUserBuId(id: number) {
   }
 }
 
-export async function signUp(email: string, password: string) {
-  try {
-    const hashedPassword = await Bun.password.hash(password, {
-      algorithm: "bcrypt",
-    });
-    console.log(email, hashedPassword);
-
-    await db
-      .insert(usersTable)
-      .values({ email: email.toLowerCase(), password: hashedPassword });
-  } catch (error) {
-    console.log(error);
-  }
-}
 export type user = {
   email: string;
   password: string;

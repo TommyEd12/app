@@ -23,7 +23,7 @@ export async function getUsersOrders(userId: number) {
       .leftJoin(usersTable, eq(ordersTable.userId, usersTable.id));
     return usersOrders;
   } catch (e: unknown) {
-    console.log(`Error getting user:${e}`);
+    console.log(`Error getting users orders:${e}`);
   }
 }
 export async function createOrder(options: { userId: number; status: status }) {

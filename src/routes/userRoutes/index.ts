@@ -1,6 +1,5 @@
 import { Elysia, t } from "elysia";
-
-import { getUserBuId, getUsers, signUp } from "../../controllers/userContoller";
+import { getUserBuId, getUsers } from "../../controllers/userContoller";
 import jwt from "@elysiajs/jwt";
 import cookie from "@elysiajs/cookie";
 import { usersTable } from "../../db/schema";
@@ -17,7 +16,7 @@ export const userRoutes = new Elysia({ prefix: "/user" })
   )
   .post(
     "/login",
-    async ({ jwt, cookie: { auth }, body, }) => {
+    async ({ jwt, cookie: { auth }, body }) => {
       const { email, password } = body;
       const user = await db
         .select()
@@ -56,12 +55,36 @@ export const userRoutes = new Elysia({ prefix: "/user" })
     }
   )
   .get("/", () => getUsers())
-  .post("/signUp", async ({ body: { email, password } }) => signUp(email, password), {
-    body: t.Object({
-      email: t.String({ format: "email" }),
-      password: t.String({ minLength: 8 }),
-    }),
-  })
+  .post(
+    "/signUp",
+    async ({ jwt, cookie: { auth }, body }) => {
+      const { email, password } = body;
+      try {
+        const hashedPassword = await Bun.password.hash(password, {
+          algorithm: "bcrypt",
+        });
+        console.log(email, hashedPassword);
+
+        await db
+          .insert(usersTable)
+          .values({ email: email.toLowerCase(), password: hashedPassword });
+        auth.set({
+          value: await jwt.sign(body),
+          httpOnly: true,
+          maxAge: 7 * 86400,
+          path: "http://localhost:3049/api/user/profile",
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    {
+      body: t.Object({
+        email: t.String({ format: "email" }),
+        password: t.String({ minLength: 8 }),
+      }),
+    }
+  )
   .post("/", () => "create user")
   .get("/profile", async ({ jwt, set, cookie: { auth } }) => {
     const profile = await jwt.verify(auth.value);

@@ -1,5 +1,4 @@
 import { integer, pgTable, varchar, pgEnum, serial } from "drizzle-orm/pg-core";
-import { Button } from "react-bootstrap";
 export const roleEnum = pgEnum("role", ["user", "admin"]);
 export const statusEnum = pgEnum("status", [
   "Created",

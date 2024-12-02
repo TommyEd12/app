@@ -5,6 +5,9 @@ import {
   getProducts,
   updateProduct,
 } from "../../controllers/productContoller";
+import { db } from "../../db";
+import { productsTable } from "../../db/schema";
+import { eq } from "drizzle-orm";
 
 const productRoutes = new Elysia({ prefix: "/product" })
   .get("/", () => getProducts)
@@ -94,6 +97,20 @@ const productRoutes = new Elysia({ prefix: "/product" })
         categoryId: t.Numeric(),
         brandId: t.Numeric(),
         images: t.Array(t.String()),
+      }),
+    }
+  )
+  .delete(
+    "/:productId",
+    async ({ params: { productId } }) => {
+      await db
+        .delete(productsTable)
+        .where(eq(productsTable.id, productId)); 
+      return ("product deleted successfully")
+    },
+    {
+      params: t.Object({
+        productId: t.Numeric(),
       }),
     }
   );
