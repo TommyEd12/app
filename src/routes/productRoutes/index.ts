@@ -8,8 +8,10 @@ import {
 import { db } from "../../db";
 import { productsTable } from "../../db/schema";
 import { eq } from "drizzle-orm";
+import cors from "@elysiajs/cors";
 
 const productRoutes = new Elysia({ prefix: "/product" })
+
   .get("/", () => getProducts)
   .get(
     "/:productId",

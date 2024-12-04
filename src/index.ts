@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import userRoutes from "./routes/userRoutes";
+import  cors  from "@elysiajs/cors";
 import productRoutes from "./routes/productRoutes";
 import orderRoutes from "./routes/orderRoutes";
 import jwt from "@elysiajs/jwt";
@@ -13,6 +14,7 @@ const app = new Elysia({
     secrets: ["awd"],
   },
 });
+app   
 app
   .use(
     jwt({
@@ -20,6 +22,7 @@ app
       secret: Bun.env.JWTSECRET!,
     })
   )
+  .use(cors({origin:"http://localhost:5000"}))
   .group("api", (app) => app.use(userRoutes))
   .group("api", (app) => app.use(sliderContentRoutes))
   .group("api", (app) => app.use(categoryRoutes))
