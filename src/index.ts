@@ -8,12 +8,9 @@ import orderProductsRoutes from "./routes/orderProducts";
 import brandRoutes from "./routes/brandRoutes";
 import categoryRoutes from "./routes/categoriesRoutes";
 import sliderContentRoutes from "./routes/sliderContentRoutes";
+import cookie from "@elysiajs/cookie";
 
-const app = new Elysia({
-  cookie: {
-    secrets: ["awd"],
-  },
-});
+const app = new Elysia();
 app   
 app
   .use(
@@ -22,7 +19,7 @@ app
       secret: Bun.env.JWTSECRET!,
     })
   )
-  .use(cors({origin:"http://localhost:5000"}))
+  .use(cors({origin:"http://localhost:5000", credentials:true}))
   .group("api", (app) => app.use(userRoutes))
   .group("api", (app) => app.use(sliderContentRoutes))
   .group("api", (app) => app.use(categoryRoutes))

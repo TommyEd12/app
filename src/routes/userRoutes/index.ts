@@ -2,18 +2,26 @@ import { Elysia, t } from "elysia";
 import { getUserBuId, getUsers } from "../../controllers/userContoller";
 import jwt from "@elysiajs/jwt";
 import cookie from "@elysiajs/cookie";
-import { usersTable } from "../../db/schema";
+import { OTPTable, usersTable } from "../../db/schema";
 import { takeUniqueOrThrow } from "../../controllers/userContoller";
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
+import cors from "@elysiajs/cors";
+import { createOTP } from "../../utils/createOTP";
+import * as React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import OTPEmail from "../../emails/otp";
+import { sendEmail } from "../../utils/sendEmail";
 
 export const userRoutes = new Elysia({ prefix: "/user" })
+
   .use(
     jwt({
       name: "jwt",
       secret: "Fischl von Luftschloss Narfidort",
     })
   )
+  .use(cors({ origin: "http://localhost:5000", credentials: true }))
   .post(
     "/login",
     async ({ jwt, cookie: { auth }, body }) => {
@@ -37,13 +45,14 @@ export const userRoutes = new Elysia({ prefix: "/user" })
       auth.set({
         value: await jwt.sign(body),
         httpOnly: true,
+        domain: ".localhost",
         maxAge: 7 * 86400,
-        path: "http://localhost:3049/api/user/profile",
+        path: "/",
       });
 
       return {
         success: true,
-        data: null,
+        data: auth,
         message: "Account login successfully",
       };
     },
@@ -55,6 +64,18 @@ export const userRoutes = new Elysia({ prefix: "/user" })
     }
   )
   .get("/", () => getUsers())
+  .post("/logout", ({ cookie: { auth } }) => {
+    auth.set({
+      httpOnly: true,
+      domain: ".localhost",
+      expires: new Date(100),
+      path: "/",
+    });
+    return {
+      success: true,
+      message: "logout successful",
+    };
+  })
   .post(
     "/signUp",
     async ({ jwt, cookie: { auth }, body }) => {
@@ -72,10 +93,17 @@ export const userRoutes = new Elysia({ prefix: "/user" })
           value: await jwt.sign(body),
           httpOnly: true,
           maxAge: 7 * 86400,
-          path: "http://localhost:3049/api/user/profile",
+          domain: ".localhost",
+          path: "/",
         });
+        return {
+          success: true,
+          data: auth,
+          message: "Account created successfully",
+        };
       } catch (error) {
         console.log(error);
+        return error;
       }
     },
     {
@@ -85,7 +113,6 @@ export const userRoutes = new Elysia({ prefix: "/user" })
       }),
     }
   )
-  .post("/", () => "create user")
   .get("/profile", async ({ jwt, set, cookie: { auth } }) => {
     const profile = await jwt.verify(auth.value);
 
@@ -94,12 +121,61 @@ export const userRoutes = new Elysia({ prefix: "/user" })
       return "Unauthorized";
     }
 
-    return `Hello ${profile.email}`;
+    return {
+      success: true,
+      data: profile.email,
+      message: "login successful",
+    };
   })
   .get("/:id", ({ params: { id } }) => getUserBuId(id), {
     params: t.Object({
       id: t.Numeric(),
     }),
-  });
+  })
+  .get(
+    "/getUserByEmail",
+    async ({ query }) => {
+      const { email } = query;
+      const user = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.email, email));
+      return user;
+    },
+    {
+      query: t.Object({
+        email: t.String(),
+      }),
+    }
+  )
+  .post(
+    "/OTP",
+    async ({ body }) => {
+      try {
+        const { email, subject, message, duration } = body;
+        if (!email) {
+          throw Error("An email, subject, message, duration are required");
+        }
+        await db.delete(OTPTable).where(eq(OTPTable.email, email));
+        const generatedOTP = await createOTP();
+        const html = renderToStaticMarkup(OTPEmail(generatedOTP));
+        const mailOptions = {
+          from: Bun.env.AUTH_EMAIL!,
+          to: email,
+          subject,
+          html,
+        };
+        await sendEmail(mailOptions);
+      } catch (error) {}
+    },
+    {
+      body: t.Object({
+        email: t.String({ format: "email" }),
+        subject: t.String(),
+        message: t.String(),
+        duration: t.Numeric({ default: 1 }),
+      }),
+    }
+  );
 
 export default userRoutes;

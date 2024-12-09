@@ -7,7 +7,7 @@ import {
 } from "../../controllers/productContoller";
 import { db } from "../../db";
 import { productsTable } from "../../db/schema";
-import { eq } from "drizzle-orm";
+import { eq, like, or } from "drizzle-orm";
 import cors from "@elysiajs/cors";
 
 const productRoutes = new Elysia({ prefix: "/product" })
@@ -22,6 +22,10 @@ const productRoutes = new Elysia({ prefix: "/product" })
       }),
     }
   )
+  .get("/search", ({query})=>{
+    const products = db.select().from(productsTable).where(like (productsTable.name, `%${query.search}%`))
+    return products
+  } )
   .patch(
     "/:productId",
     (

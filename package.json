@@ -3,15 +3,21 @@
   "version": "1.0.50",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "email": "email dev --dir src/emails"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.1.1",
     "@elysiajs/jwt": "^1.1.1",
-    "elysia": "latest"
+    "@react-email/components": "^0.0.30",
+    "elysia": "latest",
+    "nodemailer": "^6.9.16",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "react-email": "^3.0.3"
   },
   "module": "src/index.js"
 }
