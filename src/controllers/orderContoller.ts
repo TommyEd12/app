@@ -26,12 +26,14 @@ export async function getUsersOrders(userId: number) {
     console.log(`Error getting users orders:${e}`);
   }
 }
-export async function createOrder(options: { userId: number; status: status }) {
+export async function createOrder(options: { userId: number; status: status, address: string, postIndex: number }) {
   try {
-    const { userId, status } = options;
+    const { userId, status, address, postIndex } = options;
     await db.insert(ordersTable).values({
       userId: userId,
       status: status,
+      address: address,
+      postIndex: postIndex
     });
   } catch (e: unknown) {
     console.log(`Error creating order:${e}`);

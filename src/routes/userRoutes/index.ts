@@ -140,7 +140,11 @@ export const userRoutes = new Elysia({ prefix: "/user" })
         .select()
         .from(usersTable)
         .where(eq(usersTable.email, email));
-      return user;
+        return {
+          success: true,
+          data: user,
+          message: "user found",
+        };
     },
     {
       query: t.Object({

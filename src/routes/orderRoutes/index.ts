@@ -11,7 +11,7 @@ const orderRoutes = new Elysia({ prefix: "/order" })
   })
   .post(
     "/",
-    ({ body: { userId, status: statusBody } }) => {
+    ({ body: { userId, status: statusBody, address, postIndex } }) => {
       const validStatuses: status[] = ["Created", "InProgress", "Finished"];
       if (!validStatuses.includes(statusBody as status)) {
         throw new Error("Invalid status value");
@@ -20,12 +20,17 @@ const orderRoutes = new Elysia({ prefix: "/order" })
       return createOrder({
         userId,
         status: statusBody as status,
+        address,
+        postIndex
+
       });
     },
     {
       body: t.Object({
         userId: t.Numeric(),
         status: t.String(),
+        address: t.String(),
+        postIndex: t.Numeric()
       }),
     }
   )

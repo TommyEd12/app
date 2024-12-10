@@ -1,5 +1,12 @@
 import { datetime } from "drizzle-orm/mysql-core";
-import { integer, pgTable, varchar, pgEnum, serial, date } from "drizzle-orm/pg-core";
+import {
+  integer,
+  pgTable,
+  varchar,
+  pgEnum,
+  serial,
+  date,
+} from "drizzle-orm/pg-core";
 export const roleEnum = pgEnum("role", ["user", "admin"]);
 export const statusEnum = pgEnum("status", [
   "Created",
@@ -15,12 +22,11 @@ export const usersTable = pgTable("users", {
 });
 
 export const OTPTable = pgTable("OTP", {
-  email:varchar().unique(),
+  email: varchar().unique(),
   OTP: varchar(),
   CreatedAt: date(),
-  ExpiresAt: date()
+  ExpiresAt: date(),
 });
-
 
 export const productsTable = pgTable("products", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -58,6 +64,8 @@ export const ordersTable = pgTable("orders", {
     .notNull()
     .references(() => usersTable.id),
   status: statusEnum(),
+  address: varchar({ length: 255 }),
+  postIndex: integer(),
 });
 
 export const orderProducts = pgTable("orderProducts", {
