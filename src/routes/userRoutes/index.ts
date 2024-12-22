@@ -12,6 +12,7 @@ import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import OTPEmail from "../../emails/otp";
 import { sendEmail } from "../../utils/sendEmail";
+import { DateTime } from "luxon";
 
 export const userRoutes = new Elysia({ prefix: "/user" })
 
@@ -140,11 +141,11 @@ export const userRoutes = new Elysia({ prefix: "/user" })
         .select()
         .from(usersTable)
         .where(eq(usersTable.email, email));
-        return {
-          success: true,
-          data: user,
-          message: "user found",
-        };
+      return {
+        success: true,
+        data: user,
+        message: "user found",
+      };
     },
     {
       query: t.Object({
@@ -156,10 +157,12 @@ export const userRoutes = new Elysia({ prefix: "/user" })
     "/OTP",
     async ({ body }) => {
       try {
-        const { email, subject, message, duration } = body;
+        const { email } = body;
         if (!email) {
-          throw Error("An email, subject, message, duration are required");
+          throw Error("An email is required");
         }
+        const subject = "Сброс пароля";
+        const duration = 10;
         await db.delete(OTPTable).where(eq(OTPTable.email, email));
         const generatedOTP = await createOTP();
         const html = renderToStaticMarkup(OTPEmail(generatedOTP));
@@ -170,14 +173,94 @@ export const userRoutes = new Elysia({ prefix: "/user" })
           html,
         };
         await sendEmail(mailOptions);
+        const hashedOTP = await Bun.password.hash(generatedOTP.toString(), {
+          algorithm: "bcrypt",
+        });
+        const now = DateTime.now();
+        const expiresAt = now.plus({ minutes: duration });
+        const newOTP = {
+          email: email,
+          OTP: hashedOTP,
+          CreatedAt: now.toISO(),
+          ExpiresAt: expiresAt.toISO(),
+        };
+        await db.insert(OTPTable).values(newOTP);
       } catch (error) {}
     },
     {
       body: t.Object({
-        email: t.String({ format: "email" }),
-        subject: t.String(),
-        message: t.String(),
-        duration: t.Numeric({ default: 1 }),
+        email: t.String({ format: "email" })
+      }),
+    }
+  )
+  .post("/sendOTP", async () => {
+    const generatedOTP = await createOTP();
+    const hashedOTP = await Bun.password.hash(generatedOTP.toString(), {
+      algorithm: "bcrypt",
+    });
+    const now = DateTime.now();
+    const expiresAt = now.plus({ hours: 1 });
+    const newOTP = {
+      email: "test@mail.com",
+      OTP: hashedOTP,
+      CreatedAt: now.toISO(),
+      ExpiresAt: expiresAt.toISO(),
+    };
+    await db.insert(OTPTable).values(newOTP);
+  })
+  .get("/OTP", async () => {
+    const OTPs = await db.select().from(OTPTable);
+    return OTPs;
+  })
+  .post(
+    "/resetPassword",
+    async ({ body }) => {
+      try {
+        const { email, newPassword, otp } = body;
+        if (!(email && otp)) {
+          throw Error("Provide values for email, otp");
+        }
+        const matchedOTPRecords = await db
+          .select()
+          .from(OTPTable)
+          .where(eq(OTPTable.email, email));
+        const matchedOTPRecord = matchedOTPRecords[0];
+        if (!matchedOTPRecord) {
+          return { success: false, error: "No otp records found" };
+        }
+        const expiresAt = DateTime.fromISO(matchedOTPRecord.ExpiresAt);
+        if (expiresAt < DateTime.fromISO(Date.now())) {
+          await db.delete(OTPTable).where(eq(OTPTable.email, email));
+        }
+        const isCorrectOTP = await Bun.password.verify(
+          otp,
+          matchedOTPRecord.OTP,
+          "bcrypt"
+        );
+        if (!isCorrectOTP) {
+          return { success: false, error: "Otp is incorrect" };
+        }
+        const hashedPassword = await Bun.password.hash(newPassword, {
+          algorithm: "bcrypt",
+        });
+        await db
+          .update(usersTable)
+          .set({ password: hashedPassword })
+          .where(eq(usersTable.email, email));
+        return {
+          success: true,
+          data: isCorrectOTP,
+          message: "OTP is correct",
+        };
+      } catch (error) {
+        throw error;
+      }
+    },
+    {
+      body: t.Object({
+        otp: t.String(),
+        email: t.String(),
+        newPassword: t.String({ minLength: 8 }),
       }),
     }
   );

@@ -1,3 +1,4 @@
+import { max } from "drizzle-orm";
 import { datetime } from "drizzle-orm/mysql-core";
 import {
   integer,
@@ -37,13 +38,13 @@ export const productsTable = pgTable("products", {
   description: varchar({ length: 255 }),
   categoryId: integer().references(() => categoriesTable.id),
   brandId: integer().references(() => brandsTable.id),
-  images: varchar({ length: 255 }).array(),
+  images: varchar().array(),
 });
 
 export const brandsTable = pgTable("brands", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 255 }).notNull(),
-  image: varchar({ length: 255 }),
+  image: varchar(),
 });
 
 export const categoriesTable = pgTable("categories", {

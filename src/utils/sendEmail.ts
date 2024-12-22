@@ -5,15 +5,16 @@ const AUTH_PASS = Bun.env.AUTH_PASS!;
 
 
 const transporter = nodemailer.createTransport({
-  host: 'mx2.hosting.reg.ru.',
+  host: 'mail.hosting.reg.ru',
   port: 465,
   secure: true,
+  pool: true,
   auth: {
-      user: 'musco.store@musco.store',
-      pass: 'Mus056056'
+      user: 'musco@mail.musandco.ru',
+      pass: 'tFVkU5bNnPLgPUW'
   },
   tls: {
-    rejectUnauthorized: false,
+    rejectUnauthorized: true,
   },
 });
 
@@ -25,6 +26,12 @@ transporter.verify((error, success) => {
     console.log(success);
   }
 });
+const mailOptionss = {
+  from: 'musco@mail.musandco.ru', 
+  to: "bobylev.e@inbox.ru",
+  subject:"11111",
+  text:"111111"
+};
 export const sendEmail = async (mailOptions) => {
   try {
     await transporter.sendMail(mailOptions);
