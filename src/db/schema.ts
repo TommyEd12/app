@@ -35,7 +35,7 @@ export const productsTable = pgTable("products", {
   price: integer().default(0),
   discountPrice: integer(),
   count: integer().default(0),
-  description: varchar({ length: 255 }),
+  description: varchar(),
   categoryId: integer().references(() => categoriesTable.id),
   brandId: integer().references(() => brandsTable.id),
   images: varchar().array(),
