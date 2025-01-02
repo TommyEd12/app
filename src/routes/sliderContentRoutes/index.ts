@@ -38,31 +38,41 @@ const sliderContentRoutes = new Elysia({ prefix: "/sliderContent" })
       body: t.Object({
         buttonTitle: t.String(),
         buttonLink: t.String(),
-        image: t.Array(t.String()),
+        image: t.String(),
       }),
     }
   )
-  .patch("/",
-    async ({ body }) => {
+  .patch(
+    "/:sliderContentId",
+    async ({ body, params: { sliderContentId } }) => {
       const { buttonTitle, buttonLink, image } = body;
-      await db.update(sliderContentTable).set({
-        buttonTitle: buttonTitle,
-        buttonLink: buttonLink,
-        image: image,
-      });
+      await db
+        .update(sliderContentTable)
+        .set({
+          buttonTitle: buttonTitle,
+          buttonLink: buttonLink,
+          image: image,
+        })
+        .where(eq(sliderContentTable.id, sliderContentId));
       return "slider content changed successfully";
     },
     {
       body: t.Object({
         buttonTitle: t.String(),
         buttonLink: t.String(),
-        image: t.Array(t.String()),
+        image: t.String(),
       }),
-    })
+      params: t.Object({
+        sliderContentId: t.Numeric(),
+      }),
+    }
+  )
   .delete(
     "/:sliderContentId",
     async ({ params: { sliderContentId } }) => {
-      await db.delete(sliderContentTable).where(eq(sliderContentTable.id, sliderContentId));
+      await db
+        .delete(sliderContentTable)
+        .where(eq(sliderContentTable.id, sliderContentId));
       return "slider content deleted successfully";
     },
     {

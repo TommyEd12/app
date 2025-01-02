@@ -56,7 +56,7 @@ export const sliderContentTable = pgTable("sliderContent", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   buttonTitle: varchar({ length: 255 }),
   buttonLink: varchar({ length: 255 }),
-  image: varchar({ length: 255 }).array(),
+  image: varchar(),
 });
 
 export const ordersTable = pgTable("orders", {

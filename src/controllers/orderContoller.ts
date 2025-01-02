@@ -17,23 +17,29 @@ export async function getUsersOrders(userId: number) {
         orderId: ordersTable.id,
         status: ordersTable.status,
         usersId: usersTable.id,
-        usersEmail: usersTable.email
+        usersEmail: usersTable.email,
       })
       .from(ordersTable)
-      .leftJoin(usersTable, eq(ordersTable.userId, usersTable.id));
+      .leftJoin(usersTable, eq(ordersTable.userId, usersTable.id))
+      .where(eq(ordersTable.userId, userId));
     return usersOrders;
   } catch (e: unknown) {
     console.log(`Error getting users orders:${e}`);
   }
 }
-export async function createOrder(options: { userId: number; status: status, address: string, postIndex: number }) {
+export async function createOrder(options: {
+  userId: number;
+  status: status;
+  address: string;
+  postIndex: number;
+}) {
   try {
     const { userId, status, address, postIndex } = options;
     await db.insert(ordersTable).values({
       userId: userId,
       status: status,
       address: address,
-      postIndex: postIndex
+      postIndex: postIndex,
     });
   } catch (e: unknown) {
     console.log(`Error creating order:${e}`);

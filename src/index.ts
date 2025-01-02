@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
 import userRoutes from "./routes/userRoutes";
-import  cors  from "@elysiajs/cors";
+import cors from "@elysiajs/cors";
 import productRoutes from "./routes/productRoutes";
 import orderRoutes from "./routes/orderRoutes";
 import jwt from "@elysiajs/jwt";
@@ -10,8 +10,9 @@ import categoryRoutes from "./routes/categoriesRoutes";
 import sliderContentRoutes from "./routes/sliderContentRoutes";
 import cookie from "@elysiajs/cookie";
 
+
 const app = new Elysia();
-app   
+app;
 app
   .use(
     jwt({
@@ -19,7 +20,7 @@ app
       secret: Bun.env.JWTSECRET!,
     })
   )
-  .use(cors({origin:"http://localhost:5000", credentials:true}))
+  .use(cors({ origin: "http://localhost:5000", credentials: true }))
   .group("api", (app) => app.use(userRoutes))
   .group("api", (app) => app.use(sliderContentRoutes))
   .group("api", (app) => app.use(categoryRoutes))

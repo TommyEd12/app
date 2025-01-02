@@ -14,7 +14,7 @@ const orderProductsRoutes = new Elysia({ prefix: "/orderProducts" })
         })
         .from(orderProducts)
         .where(eq(orderProducts.orderId, orderId));
-        return(products)
+      return products;
     },
     {
       params: t.Object({
@@ -25,18 +25,24 @@ const orderProductsRoutes = new Elysia({ prefix: "/orderProducts" })
   .post(
     "/",
     async ({ body }) => {
-      const { id, orderId, productId, quantity } = body;
+      const { orderId, productId, quantity } = body;
+      try{
       await db.insert(orderProducts).values({
-        id: id,
         orderId: orderId,
         productId: productId,
         quantity: quantity,
       });
-      return("products added successfully")
+      } catch (error){
+        return error
+      }
+      return {
+        success: true,
+        data: productId,
+        message: "Product added correctly",
+      };
     },
     {
       body: t.Object({
-        id: t.Numeric(),
         orderId: t.Numeric(),
         productId: t.Numeric(),
         quantity: t.Numeric(),
