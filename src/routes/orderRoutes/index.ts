@@ -24,11 +24,11 @@ const robokassaHelper = new robokassa.RobokassaHelper({
 
 const orderRoutes = new Elysia({ prefix: "/order" })
   .get("/", () => getOrders())
-  // .get("/:userId", ({ params: { userId } }) => getUsersOrders(userId), {
-  //   params: t.Object({
-  //     userId: t.Numeric(),
-  //   }),
-  // })
+  .get("/:userId", ({ params: { userId } }) => getUsersOrders(userId), {
+    params: t.Object({
+      userId: t.Numeric(),
+    }),
+  })
 
   .post(
     "/",
@@ -88,19 +88,19 @@ const orderRoutes = new Elysia({ prefix: "/order" })
       return await new Promise(async (resolve, reject) => {
         robokassaHelper.handleResultUrlRequest(
           request,
-            {
-              setHeader: (header, value) => {
-                set.headers[header] = value;
-              },
-              status: (code: number) => {
-                set.status = code;
-              },
-              send: (message: string) => {
-                set.status = 400;
-                resolve({ message: message });
-              },
-              end: () => {},
+          {
+            setHeader: (header, value) => {
+              set.headers[header] = value;
             },
+            status: (code: number) => {
+              set.status = code;
+            },
+            send: (message: string) => {
+              set.status = 400;
+              resolve({ message: message });
+            },
+            end: () => {},
+          },
           async (values, userData: UserData) => {
             console.log({
               values: values,
