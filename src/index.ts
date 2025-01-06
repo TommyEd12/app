@@ -20,7 +20,7 @@ app
       secret: Bun.env.JWTSECRET!,
     })
   )
-  .use(cors({ origin: "http://localhost:5000", credentials: true }))
+  .use(cors({ origin: ["http://localhost:5000", "http://musandco"], credentials: true }))
   .group("api", (app) => app.use(userRoutes))
   .group("api", (app) => app.use(sliderContentRoutes))
   .group("api", (app) => app.use(categoryRoutes))
