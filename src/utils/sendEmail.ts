@@ -10,8 +10,8 @@ const transporter = nodemailer.createTransport({
   secure: true,
   pool: true,
   auth: {
-      user: 'musco@mail.musandco.ru',
-      pass: 'tFVkU5bNnPLgPUW'
+      user: Bun.env.AUTH_EMAIL,
+      pass: Bun.env.AUTH_PASS
   },
   tls: {
     rejectUnauthorized: true,
@@ -26,12 +26,12 @@ transporter.verify((error, success) => {
     console.log(success);
   }
 });
-const mailOptionss = {
-  from: 'musco@mail.musandco.ru', 
-  to: "bobylev.e@inbox.ru",
-  subject:"11111",
-  text:"111111"
-};
+// const mailOptionss = {
+//   from: 'musco@mail.musandco.ru', 
+//   to: "bobylev.e@inbox.ru",
+//   subject:"11111",
+//   text:"111111"
+// };
 export const sendEmail = async (mailOptions) => {
   try {
     await transporter.sendMail(mailOptions);
