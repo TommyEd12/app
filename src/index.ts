@@ -10,7 +10,6 @@ import categoryRoutes from "./routes/categoriesRoutes";
 import sliderContentRoutes from "./routes/sliderContentRoutes";
 import cookie from "@elysiajs/cookie";
 
-
 const app = new Elysia();
 app;
 app
@@ -20,7 +19,12 @@ app
       secret: Bun.env.JWTSECRET!,
     })
   )
-  .use(cors({ origin: ["http://localhost:5000", "http://musandco"], credentials: true }))
+  .use(
+    cors({
+      origin: ["http://localhost:5000", "http://musandco"],
+      credentials: true,
+    })
+  )
   .group("api", (app) => app.use(userRoutes))
   .group("api", (app) => app.use(sliderContentRoutes))
   .group("api", (app) => app.use(categoryRoutes))
@@ -28,7 +32,7 @@ app
   .group("api", (app) => app.use(orderRoutes))
   .group("api", (app) => app.use(orderProductsRoutes))
   .group("api", (app) => app.use(brandRoutes))
-  .listen(process.env.PORT || 3049);
+  .listen(Bun.env.PORT || 3049);
 
 console.log(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
