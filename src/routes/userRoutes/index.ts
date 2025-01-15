@@ -46,7 +46,7 @@ export const userRoutes = new Elysia({ prefix: "/user" })
       auth.set({
         value: await jwt.sign(body),
         httpOnly: true,
-        domain: ".localhost",
+        domain: "musandco.ru",
         maxAge: 7 * 86400,
         path: "/",
       });
@@ -68,7 +68,7 @@ export const userRoutes = new Elysia({ prefix: "/user" })
   .post("/logout", ({ cookie: { auth } }) => {
     auth.set({
       httpOnly: true,
-      domain: ".localhost",
+      domain: "musandco.ru",
       expires: new Date(100),
       path: "/",
     });
@@ -94,7 +94,7 @@ export const userRoutes = new Elysia({ prefix: "/user" })
           value: await jwt.sign(body),
           httpOnly: true,
           maxAge: 7 * 86400,
-          domain: ".localhost",
+          domain: "musandco.ru",
           path: "/",
         });
         return {
