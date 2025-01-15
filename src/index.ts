@@ -21,7 +21,13 @@ app
   )
   .use(
     cors({
-      origin: ["http://localhost:5000", "http://musandco"],
+      origin: [
+        "http://localhost:5000",
+        "http://musandco.ru",
+        "https://musandco.ru",
+        "http://www.musandco.ru",
+        "https://www.musandco.ru",
+      ],
       credentials: true,
     })
   )

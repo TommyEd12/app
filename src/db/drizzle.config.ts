@@ -1,10 +1,10 @@
-import "dotenv/config";
-import { defineConfig } from "drizzle-kit";
+import 'dotenv/config';
+import { defineConfig } from 'drizzle-kit';
 export default defineConfig({
-  out: "./drizzle",
-  schema: "./schema.ts",
-  dialect: "postgresql",
+  out: './drizzle',
+  schema: './schema.ts',
+  dialect: 'postgresql',
   dbCredentials: {
-    url: Bun.env.DBSTRING || "",
+    url: "postgres://postgres:postgres@localhost:5432/postgres",
   },
 });
