@@ -11,7 +11,7 @@ import sliderContentRoutes from "./routes/sliderContentRoutes";
 import cookie from "@elysiajs/cookie";
 
 const app = new Elysia();
-app;
+
 app
   .use(
     jwt({
@@ -31,13 +31,17 @@ app
       credentials: true,
     })
   )
-  .group("api", (app) => app.use(userRoutes))
-  .group("api", (app) => app.use(sliderContentRoutes))
-  .group("api", (app) => app.use(categoryRoutes))
-  .group("api", (app) => app.use(productRoutes))
-  .group("api", (app) => app.use(orderRoutes))
-  .group("api", (app) => app.use(orderProductsRoutes))
-  .group("api", (app) => app.use(brandRoutes))
+  .group("/api", (app) => app.use(userRoutes))
+  .group("/api", (app) => app.use(sliderContentRoutes))
+  .group("/api", (app) => app.use(categoryRoutes))
+  .group("/api", (app) => app.use(productRoutes))
+  .group("/api", (app) => app.use(orderRoutes))
+  .group("/api", (app) => app.use(orderProductsRoutes))
+  .group("/api", (app) => app.use(brandRoutes))
+  .get("/test", (context) => {
+    console.log("Headers:", context.request.headers);
+    return "Success";
+  })
   .listen(Bun.env.PORT || 3049);
 
 console.log(

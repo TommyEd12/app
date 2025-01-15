@@ -22,7 +22,6 @@ export const userRoutes = new Elysia({ prefix: "/user" })
       secret: "Fischl von Luftschloss Narfidort",
     })
   )
-  .use(cors({ origin: ["http://musandco", "http://localhost:5000"], credentials: true }))
   .post(
     "/login",
     async ({ jwt, cookie: { auth }, body }) => {
