@@ -37,7 +37,7 @@ const categoryRoutes = new Elysia({ prefix: "/category" })
       body: t.Object({
         name: t.String(),
       }),
-      beforeHandle: [authorizeAdmin()],
+      beforeHandle: [authorizeAdmin],
     }
   )
   .delete(
