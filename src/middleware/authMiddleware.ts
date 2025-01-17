@@ -7,7 +7,7 @@ interface JwtPayload {
 }
 
 export const authorizeAdmin = () => ({
-  async beforeHandle({ auth, set, jwt }: Context) {
+  async beforeHandle({ cookie:{auth}, set, jwt }: Context) {
     // Get the JWT from the cookie
     const token = auth.value  
 
