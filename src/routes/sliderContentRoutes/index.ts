@@ -107,7 +107,6 @@ const sliderContentRoutes = new Elysia({ prefix: "/sliderContent" })
       params: t.Object({
         sliderContentId: t.Numeric(),
       }),
-      beforeHandle: [authorizeAdmin],
     }
   );
 

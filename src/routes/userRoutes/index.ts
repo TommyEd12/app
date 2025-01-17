@@ -13,7 +13,6 @@ import { renderToStaticMarkup } from "react-dom/server";
 import OTPEmail from "../../emails/otp";
 import { sendEmail } from "../../utils/sendEmail";
 import { DateTime } from "luxon";
-import { authorizeAdmin } from "../../middleware/authMiddleware";
 
 export const userRoutes = new Elysia({ prefix: "/user" })
 
@@ -198,14 +197,15 @@ export const userRoutes = new Elysia({ prefix: "/user" })
       }),
     }
   )
-  .get(
-    "/OTP",
-    async () => {
-      const OTPs = await db.select().from(OTPTable);
-      return OTPs;
-    },
-    { beforeHandle: [authorizeAdmin] }
-  )
+  .get("/OTP", async ({ jwt, set, cookie: { auth } }) => {
+    const profile = await jwt.verify(auth.value);
+    if (!profile || profile.role != "admin") {
+      set.status = 401;
+      throw new Error("unathorized");
+    }
+    const OTPs = await db.select().from(OTPTable);
+    return OTPs;
+  })
   .post(
     "/resetPassword",
     async ({ body }) => {
