@@ -2,9 +2,15 @@ import { Elysia, t } from "elysia";
 import { db } from "../../db";
 import { brandsTable, sliderContentTable } from "../../db/schema";
 import { eq } from "drizzle-orm";
-import { authorizeAdmin } from "../../middleware/authMiddleware";
+import jwt from "@elysiajs/jwt";
 
 const sliderContentRoutes = new Elysia({ prefix: "/sliderContent" })
+  .use(
+    jwt({
+      name: "jwt",
+      secret: Bun.env.JWT_SECRET!,
+    })
+  )
   .get(
     "/:sliderContentId",
     async ({ params: { sliderContentId } }) => {
@@ -26,7 +32,12 @@ const sliderContentRoutes = new Elysia({ prefix: "/sliderContent" })
   })
   .post(
     "/",
-    async ({ body }) => {
+    async ({ body, jwt, set, cookie: { auth } }) => {
+      const profile = await jwt.verify(auth.value);
+      if (!profile || profile.role != "admin") {
+        set.status = 401;
+        throw new Error("unathorized");
+      }
       const { buttonTitle, buttonLink, image } = body;
       await db.insert(sliderContentTable).values({
         buttonTitle: buttonTitle,
@@ -40,12 +51,23 @@ const sliderContentRoutes = new Elysia({ prefix: "/sliderContent" })
         buttonTitle: t.String(),
         buttonLink: t.String(),
         image: t.String(),
-      }),beforeHandle:[authorizeAdmin]
+      }),
     }
   )
   .patch(
     "/:sliderContentId",
-    async ({ body, params: { sliderContentId } }) => {
+    async ({
+      body,
+      params: { sliderContentId },
+      set,
+      jwt,
+      cookie: { auth },
+    }) => {
+      const profile = await jwt.verify(auth.value);
+      if (!profile || profile.role != "admin") {
+        set.status = 401;
+        throw new Error("unathorized");
+      }
       const { buttonTitle, buttonLink, image } = body;
       await db
         .update(sliderContentTable)
@@ -65,12 +87,17 @@ const sliderContentRoutes = new Elysia({ prefix: "/sliderContent" })
       }),
       params: t.Object({
         sliderContentId: t.Numeric(),
-      }), beforeHandle:[authorizeAdmin],
+      }),
     }
   )
   .delete(
     "/:sliderContentId",
-    async ({ params: { sliderContentId } }) => {
+    async ({ params: { sliderContentId }, jwt, set, cookie: { auth } }) => {
+      const profile = await jwt.verify(auth.value);
+      if (!profile || profile.role != "admin") {
+        set.status = 401;
+        throw new Error("unathorized");
+      }
       await db
         .delete(sliderContentTable)
         .where(eq(sliderContentTable.id, sliderContentId));
@@ -79,7 +106,8 @@ const sliderContentRoutes = new Elysia({ prefix: "/sliderContent" })
     {
       params: t.Object({
         sliderContentId: t.Numeric(),
-      }),beforeHandle:[authorizeAdmin]
+      }),
+      beforeHandle: [authorizeAdmin],
     }
   );
 

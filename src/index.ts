@@ -8,7 +8,7 @@ import orderProductsRoutes from "./routes/orderProducts";
 import brandRoutes from "./routes/brandRoutes";
 import categoryRoutes from "./routes/categoriesRoutes";
 import sliderContentRoutes from "./routes/sliderContentRoutes";
-import cookie from "@elysiajs/cookie";
+import {cookie} from "@elysiajs/cookie";
 
 const app = new Elysia();
 
@@ -43,7 +43,7 @@ app
     return "Success";
   })
   .listen(Bun.env.PORT || 3049);
-
+export type AppType = typeof app;
 console.log(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
 );

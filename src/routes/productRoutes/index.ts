@@ -9,9 +9,16 @@ import { db } from "../../db";
 import { productsTable } from "../../db/schema";
 import { eq, ilike, like, or } from "drizzle-orm";
 import cors from "@elysiajs/cors";
-import { authorizeAdmin } from "../../middleware/authMiddleware";
+
+import jwt from "@elysiajs/jwt";
 
 const productRoutes = new Elysia({ prefix: "/product" })
+  .use(
+    jwt({
+      name: "jwt",
+      secret: Bun.env.JWT_SECRET!,
+    })
+  )
 
   .get("/", () => getProducts)
   .get(
@@ -32,7 +39,7 @@ const productRoutes = new Elysia({ prefix: "/product" })
   })
   .patch(
     "/:productId",
-    ({
+    async ({
       body: {
         name,
         price,
@@ -44,7 +51,15 @@ const productRoutes = new Elysia({ prefix: "/product" })
         images,
       },
       params: { productId },
-    }) =>
+      jwt,
+      set,
+      cookie: { auth },
+    }) => {
+      const profile = await jwt.verify(auth.value);
+      if (!profile || profile.role != "admin") {
+        set.status = 401;
+        throw new Error("unathorized");
+      }
       updateProduct(productId, {
         name,
         price,
@@ -54,7 +69,8 @@ const productRoutes = new Elysia({ prefix: "/product" })
         categoryId,
         brandId,
         images,
-      }),
+      });
+    },
     {
       body: t.Object({
         name: t.String(),
@@ -69,12 +85,11 @@ const productRoutes = new Elysia({ prefix: "/product" })
       params: t.Object({
         productId: t.Numeric(),
       }),
-      beforeHandle: [authorizeAdmin],
     }
   )
   .post(
     "/",
-    ({
+    async ({
       body: {
         name,
         price,
@@ -85,7 +100,15 @@ const productRoutes = new Elysia({ prefix: "/product" })
         brandId,
         images,
       },
-    }) =>
+      jwt,
+      set,
+      cookie: { auth },
+    }) => {
+      const profile = await jwt.verify(auth.value);
+      if (!profile || profile.role != "admin") {
+        set.status = 401;
+        throw new Error("unathorized");
+      }
       createProduct({
         name,
         price,
@@ -95,7 +118,8 @@ const productRoutes = new Elysia({ prefix: "/product" })
         categoryId,
         brandId,
         images,
-      }),
+      });
+    },
     {
       body: t.Object({
         name: t.String(),
@@ -107,12 +131,16 @@ const productRoutes = new Elysia({ prefix: "/product" })
         brandId: t.Numeric(),
         images: t.Array(t.String()),
       }),
-      beforeHandle: [authorizeAdmin],
     }
   )
   .delete(
     "/:productId",
-    async ({ params: { productId } }) => {
+    async ({ params: { productId }, set, jwt, cookie: { auth } }) => {
+      const profile = await jwt.verify(auth.value);
+      if (!profile || profile.role != "admin") {
+        set.status = 401;
+        throw new Error("unathorized");
+      }
       await db.delete(productsTable).where(eq(productsTable.id, productId));
       return "product deleted successfully";
     },
@@ -120,7 +148,6 @@ const productRoutes = new Elysia({ prefix: "/product" })
       params: t.Object({
         productId: t.Numeric(),
       }),
-      beforeHandle: [authorizeAdmin],
     }
   );
 

@@ -2,9 +2,15 @@ import { Elysia, t } from "elysia";
 import { db } from "../../db";
 import { brandsTable } from "../../db/schema";
 import { eq } from "drizzle-orm";
-import { authorizeAdmin } from "../../middleware/authMiddleware";
+import jwt from "@elysiajs/jwt";
 
 const brandRoutes = new Elysia({ prefix: "/brand" })
+  .use(
+    jwt({
+      name: "jwt",
+      secret: Bun.env.JWT_SECRET!,
+    })
+  )
   .get(
     "/:brandId",
     async ({ params: { brandId } }) => {
@@ -26,7 +32,12 @@ const brandRoutes = new Elysia({ prefix: "/brand" })
   })
   .post(
     "/",
-    async ({ body }) => {
+    async ({ jwt, set, cookie: { auth }, body }) => {
+      const profile = await jwt.verify(auth.value);
+      if (!profile || profile.role != "admin") {
+        set.status = 401;
+        throw new Error("unathorized");
+      }
       const { name, image } = body;
       await db.insert(brandsTable).values({
         name: name,
@@ -39,12 +50,16 @@ const brandRoutes = new Elysia({ prefix: "/brand" })
         name: t.String(),
         image: t.String(),
       }),
-      beforeHandle: [authorizeAdmin],
     }
   )
   .delete(
     "/:brandId",
-    async ({ params: { brandId } }) => {
+    async ({ jwt, set, cookie: { auth }, params: { brandId } }) => {
+      const profile = await jwt.verify(auth.value);
+      if (!profile || profile.role != "admin") {
+        set.status = 401;
+        throw new Error("unathorized");
+      }
       await db.delete(brandsTable).where(eq(brandsTable.id, brandId));
       return "Brand deleted successfully";
     },
@@ -52,7 +67,6 @@ const brandRoutes = new Elysia({ prefix: "/brand" })
       params: t.Object({
         brandId: t.Numeric(),
       }),
-      beforeHandle: [authorizeAdmin],
     }
   );
 

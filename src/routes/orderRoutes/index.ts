@@ -8,7 +8,7 @@ import { status } from "../../controllers/orderContoller";
 import cookie from "@elysiajs/cookie";
 import robokassa from "node-robokassa";
 import { updateOrderStatus } from "../../utils/updateOrderStatus";
-import { authorizeAdmin } from "../../middleware/authMiddleware";
+import jwt from "@elysiajs/jwt";
 
 interface UserData {
   orderId: number;
@@ -24,8 +24,13 @@ const robokassaHelper = new robokassa.RobokassaHelper({
 });
 
 const orderRoutes = new Elysia({ prefix: "/order" })
-  .get("/", () => getOrders(), {
-    beforeHandle: [authorizeAdmin]})
+  .use(
+    jwt({
+      name: "jwt",
+      secret: Bun.env.JWT_SECRET!,
+    })
+  )
+  .get("/", () => getOrders(), {})
   .get("/:userId", ({ params: { userId } }) => getUsersOrders(userId), {
     params: t.Object({
       userId: t.Numeric(),
@@ -94,7 +99,7 @@ const orderRoutes = new Elysia({ prefix: "/order" })
             setHeader: (header, value) => {
               set.headers[header] = value;
             },
-            status: (code: number) => {
+            setStatus: (code: number) => {
               set.status = code;
             },
             send: (message: string) => {
