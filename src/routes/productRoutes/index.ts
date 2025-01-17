@@ -9,6 +9,7 @@ import { db } from "../../db";
 import { productsTable } from "../../db/schema";
 import { eq, ilike, like, or } from "drizzle-orm";
 import cors from "@elysiajs/cors";
+import { authorizeAdmin } from "../../middleware/authMiddleware";
 
 const productRoutes = new Elysia({ prefix: "/product" })
 
@@ -22,27 +23,28 @@ const productRoutes = new Elysia({ prefix: "/product" })
       }),
     }
   )
-  .get("/search", ({query})=>{
-    const products = db.select().from(productsTable).where(ilike (productsTable.name, `%${query.search}%`))
-    return products
-  } )
+  .get("/search", ({ query }) => {
+    const products = db
+      .select()
+      .from(productsTable)
+      .where(ilike(productsTable.name, `%${query.search}%`));
+    return products;
+  })
   .patch(
     "/:productId",
-    (
-      {
-        body: {
-          name,
-          price,
-          discountPrice,
-          count,
-          description,
-          categoryId,
-          brandId,
-          images,
-        },
-        params:{ productId}
-      }
-    ) =>
+    ({
+      body: {
+        name,
+        price,
+        discountPrice,
+        count,
+        description,
+        categoryId,
+        brandId,
+        images,
+      },
+      params: { productId },
+    }) =>
       updateProduct(productId, {
         name,
         price,
@@ -67,6 +69,7 @@ const productRoutes = new Elysia({ prefix: "/product" })
       params: t.Object({
         productId: t.Numeric(),
       }),
+      beforeHandle: [authorizeAdmin],
     }
   )
   .post(
@@ -104,20 +107,20 @@ const productRoutes = new Elysia({ prefix: "/product" })
         brandId: t.Numeric(),
         images: t.Array(t.String()),
       }),
+      beforeHandle: [authorizeAdmin],
     }
   )
   .delete(
     "/:productId",
     async ({ params: { productId } }) => {
-      await db
-        .delete(productsTable)
-        .where(eq(productsTable.id, productId)); 
-      return ("product deleted successfully")
+      await db.delete(productsTable).where(eq(productsTable.id, productId));
+      return "product deleted successfully";
     },
     {
       params: t.Object({
         productId: t.Numeric(),
       }),
+      beforeHandle: [authorizeAdmin],
     }
   );
 

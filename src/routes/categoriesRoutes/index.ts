@@ -2,6 +2,7 @@ import { Elysia, t } from "elysia";
 import { db } from "../../db";
 import { categoriesTable } from "../../db/schema";
 import { eq } from "drizzle-orm";
+import { authorizeAdmin } from "../../middleware/authMiddleware";
 
 const categoryRoutes = new Elysia({ prefix: "/category" })
   .get(
@@ -36,6 +37,7 @@ const categoryRoutes = new Elysia({ prefix: "/category" })
       body: t.Object({
         name: t.String(),
       }),
+      beforeHandle: [authorizeAdmin],
     }
   )
   .delete(
@@ -50,6 +52,7 @@ const categoryRoutes = new Elysia({ prefix: "/category" })
       params: t.Object({
         categoryId: t.Numeric(),
       }),
+      beforeHandle: [authorizeAdmin],
     }
   );
 

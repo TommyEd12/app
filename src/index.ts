@@ -16,7 +16,7 @@ app
   .use(
     jwt({
       name: "jwt",
-      secret: Bun.env.JWTSECRET!,
+      secret: Bun.env.JWT_SECRET!,
     })
   )
   .use(

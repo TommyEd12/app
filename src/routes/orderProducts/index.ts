@@ -2,6 +2,7 @@ import { Elysia, t } from "elysia";
 import { db } from "../../db";
 import { orderProducts, ordersTable } from "../../db/schema";
 import { eq } from "drizzle-orm";
+import { authorizeAdmin } from "../../middleware/authMiddleware";
 
 const orderProductsRoutes = new Elysia({ prefix: "/orderProducts" })
   .get(
@@ -47,6 +48,7 @@ const orderProductsRoutes = new Elysia({ prefix: "/orderProducts" })
         productId: t.Numeric(),
         quantity: t.Numeric(),
       }),
+      beforeHandle: [authorizeAdmin],
     }
   );
 

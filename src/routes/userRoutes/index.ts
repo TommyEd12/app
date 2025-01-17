@@ -13,13 +13,14 @@ import { renderToStaticMarkup } from "react-dom/server";
 import OTPEmail from "../../emails/otp";
 import { sendEmail } from "../../utils/sendEmail";
 import { DateTime } from "luxon";
+import { authorizeAdmin } from "../../middleware/authMiddleware";
 
 export const userRoutes = new Elysia({ prefix: "/user" })
 
   .use(
     jwt({
       name: "jwt",
-      secret: "Fischl von Luftschloss Narfidort",
+      secret: Bun.env.JWT_SECRET!,
     })
   )
   .post(
@@ -43,7 +44,11 @@ export const userRoutes = new Elysia({ prefix: "/user" })
         throw new Error("Неверный пароль");
       }
       auth.set({
-        value: await jwt.sign(body),
+        value: await jwt.sign({
+          email: user.email,
+          password: user.password,
+          role: user.role!,
+        }),
         httpOnly: true,
         domain: "musandco.ru",
         maxAge: 7 * 86400,
@@ -84,11 +89,12 @@ export const userRoutes = new Elysia({ prefix: "/user" })
         const hashedPassword = await Bun.password.hash(password, {
           algorithm: "bcrypt",
         });
-        console.log(email, hashedPassword);
 
-        await db
-          .insert(usersTable)
-          .values({ email: email.toLowerCase(), password: hashedPassword });
+        await db.insert(usersTable).values({
+          email: email.toLowerCase(),
+          password: hashedPassword,
+          role: "user",
+        });
         auth.set({
           value: await jwt.sign(body),
           httpOnly: true,
@@ -188,29 +194,18 @@ export const userRoutes = new Elysia({ prefix: "/user" })
     },
     {
       body: t.Object({
-        email: t.String({ format: "email" })
+        email: t.String({ format: "email" }),
       }),
     }
   )
-  .post("/sendOTP", async () => {
-    const generatedOTP = await createOTP();
-    const hashedOTP = await Bun.password.hash(generatedOTP.toString(), {
-      algorithm: "bcrypt",
-    });
-    const now = DateTime.now();
-    const expiresAt = now.plus({ hours: 1 });
-    const newOTP = {
-      email: "test@mail.com",
-      OTP: hashedOTP,
-      CreatedAt: now.toISO(),
-      ExpiresAt: expiresAt.toISO(),
-    };
-    await db.insert(OTPTable).values(newOTP);
-  })
-  .get("/OTP", async () => {
-    const OTPs = await db.select().from(OTPTable);
-    return OTPs;
-  })
+  .get(
+    "/OTP",
+    async () => {
+      const OTPs = await db.select().from(OTPTable);
+      return OTPs;
+    },
+    { beforeHandle: [authorizeAdmin] }
+  )
   .post(
     "/resetPassword",
     async ({ body }) => {
@@ -233,7 +228,7 @@ export const userRoutes = new Elysia({ prefix: "/user" })
         }
         const isCorrectOTP = await Bun.password.verify(
           otp,
-          matchedOTPRecord.OTP,
+          matchedOTPRecord.OTP!,
           "bcrypt"
         );
         if (!isCorrectOTP) {

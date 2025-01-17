@@ -4,8 +4,7 @@ import * as schema from "./schema";
 import { createProduct } from "../controllers/productContoller";
 
 export const db = drizzle(
-  // Bun.env.DBSTRING ||
-  "postgres://postgres:postgres@localhost:5432/postgres"
+  Bun.env.DBSTRING || "postgres://postgres:postgres@localhost:5432/postgres"
 );
 
 // export const db2 = drizzle({schema: schema });

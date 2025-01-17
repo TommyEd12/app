@@ -8,6 +8,7 @@ import { status } from "../../controllers/orderContoller";
 import cookie from "@elysiajs/cookie";
 import robokassa from "node-robokassa";
 import { updateOrderStatus } from "../../utils/updateOrderStatus";
+import { authorizeAdmin } from "../../middleware/authMiddleware";
 
 interface UserData {
   orderId: number;
@@ -23,7 +24,8 @@ const robokassaHelper = new robokassa.RobokassaHelper({
 });
 
 const orderRoutes = new Elysia({ prefix: "/order" })
-  .get("/", () => getOrders())
+  .get("/", () => getOrders(), {
+    beforeHandle: [authorizeAdmin]})
   .get("/:userId", ({ params: { userId } }) => getUsersOrders(userId), {
     params: t.Object({
       userId: t.Numeric(),

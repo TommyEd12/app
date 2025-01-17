@@ -2,6 +2,7 @@ import { Elysia, t } from "elysia";
 import { db } from "../../db";
 import { brandsTable, sliderContentTable } from "../../db/schema";
 import { eq } from "drizzle-orm";
+import { authorizeAdmin } from "../../middleware/authMiddleware";
 
 const sliderContentRoutes = new Elysia({ prefix: "/sliderContent" })
   .get(
@@ -39,7 +40,7 @@ const sliderContentRoutes = new Elysia({ prefix: "/sliderContent" })
         buttonTitle: t.String(),
         buttonLink: t.String(),
         image: t.String(),
-      }),
+      }),beforeHandle:[authorizeAdmin]
     }
   )
   .patch(
@@ -64,7 +65,7 @@ const sliderContentRoutes = new Elysia({ prefix: "/sliderContent" })
       }),
       params: t.Object({
         sliderContentId: t.Numeric(),
-      }),
+      }), beforeHandle:[authorizeAdmin],
     }
   )
   .delete(
@@ -78,7 +79,7 @@ const sliderContentRoutes = new Elysia({ prefix: "/sliderContent" })
     {
       params: t.Object({
         sliderContentId: t.Numeric(),
-      }),
+      }),beforeHandle:[authorizeAdmin]
     }
   );
 
