@@ -129,7 +129,7 @@ export const userRoutes = new Elysia({ prefix: "/user" })
 
     return {
       success: true,
-      data: profile.email,
+      data: [profile.email, profile.role],
       message: "login successful",
     };
   })
