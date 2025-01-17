@@ -42,5 +42,4 @@ yarn-error.log*
 package-lock.json
 **/*.bun
 
-src/db/drizzle.config.ts
-src/db/index.ts
+
