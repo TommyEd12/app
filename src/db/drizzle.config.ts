@@ -5,6 +5,6 @@ export default defineConfig({
   schema: "./schema.ts",
   dialect: "postgresql",
   dbCredentials: {
-    url: "postgres://max:123456@localhost:5432/mus?schema=public",
+    url: "postgres://postgres:postgres@localhost:5432/postgres",
   },
 });
