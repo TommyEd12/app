@@ -10,4 +10,4 @@ export const db = drizzle(
 // export const db2 = drizzle({schema: schema });
 
 // db2.query.usersTable.findFirst;
-// fff
+// fffc
