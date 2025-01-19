@@ -45,7 +45,6 @@ export const userRoutes = new Elysia({ prefix: "/user" })
       auth.set({
         value: await jwt.sign({
           email: user.email,
-          password: user.password,
           role: user.role!,
         }),
         httpOnly: true,
@@ -95,7 +94,10 @@ export const userRoutes = new Elysia({ prefix: "/user" })
           role: "user",
         });
         auth.set({
-          value: await jwt.sign(body),
+          value: await jwt.sign({
+            email: email,
+            role: "user",
+          }),
           httpOnly: true,
           maxAge: 7 * 86400,
           domain: "musandco.ru",
