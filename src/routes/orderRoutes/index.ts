@@ -31,11 +31,17 @@ const orderRoutes = new Elysia({ prefix: "/order" })
     })
   )
   .get("/", () => getOrders(), {})
-  .get("/:userId", ({ params: { userId } }) => getUsersOrders(userId), {
-    params: t.Object({
-      userId: t.Numeric(),
-    }),
-  })
+  .get(
+    "/:userId",
+    ({ params: { userId } }) => {
+      return getUsersOrders(userId);
+    },
+    {
+      params: t.Object({
+        userId: t.Numeric(),
+      }),
+    }
+  )
 
   .post(
     "/",
