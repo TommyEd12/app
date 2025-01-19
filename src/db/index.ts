@@ -4,6 +4,7 @@ import * as schema from "./schema";
 import { createProduct } from "../controllers/productContoller";
 
 export const db = drizzle(
+
   "postgres://max:123456@localhost:5432/mus?schema=public"
 );
 
