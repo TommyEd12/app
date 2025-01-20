@@ -105,13 +105,6 @@ const orderRoutes = new Elysia({ prefix: "/order" })
             setHeader: (header, value) => {
               set.headers[header] = value;
             },
-            setStatus: (code: number) => {
-              set.status = code;
-            },
-            send: (message: string) => {
-              set.status = 400;
-              resolve({ message: message });
-            },
             end: () => {},
           },
           async (values, userData: UserData) => {
