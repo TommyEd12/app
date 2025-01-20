@@ -77,7 +77,11 @@ const orderRoutes = new Elysia({ prefix: "/order" })
     }
   )
   .post("/create-payment", async ({ body, set }) => {
-    const { outSum, invDesc, options } = body;
+    const { outSum, invDesc, options } = body as {
+      outSum: number;
+      invDesc: string;
+      options: any;
+    };
 
     try {
       const paymentUrl = robokassaHelper.generatePaymentUrl(
@@ -93,23 +97,47 @@ const orderRoutes = new Elysia({ prefix: "/order" })
     }
   })
   .post("/robokassa/callback", async ({ request, set }) => {
-    robokassaHelper.handleResultUrlRequest(
-      request,
-      set,
-      async function (values, userData) {
-        console.log({
-          values: values, // Will contain general values like "invId" and "outSum"
-          userData: userData, // Will contain all your custom data passed previously, e.g.: "productId"
-        });
-        await updateOrderStatus(userData.orderId, "InProgress");
+    try {
+      return await new Promise(async (resolve, reject) => {
+        robokassaHelper.handleResultUrlRequest(
+          request,
+          {
+            setHeader: (header, value) => {
+              set.headers[header] = value;
+            },
+            setStatus: (code: number) => {
+              set.status = code;
+            },
+            send: (message: string) => {
+              set.status = 400;
+              resolve({ message: message });
+            },
+            end: () => {},
+          },
+          async (values, userData: UserData) => {
+            console.log({
+              values: values,
+              userData: userData,
+            });
+            const orderId = userData?.orderId;
 
-        // You could return "false" here in order to throw error instead of success to Robokassa.
-        // return false;
-
-        // You could also return promise here.
-        // return Promise.resolve();
-      }
-    );
+            if (!orderId) {
+              reject(new Error("Order id not found in callback data"));
+              return;
+            }
+            try {
+              await updateOrderStatus(orderId, "InProgress");
+              resolve({ message: "ok" });
+            } catch (error) {
+              reject(new Error("Failed to update order status" + error));
+            }
+          }
+        );
+      });
+    } catch (error) {
+      set.status = 500;
+      return { error: "Failed to handle callback", errorDetails: error };
+    }
   });
 
 export default orderRoutes;
