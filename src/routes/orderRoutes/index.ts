@@ -128,7 +128,6 @@ const orderRoutes = new Elysia({ prefix: "/order" })
         );
       });
     } catch (error) {
-      set.status = 500;
       return { error: "Failed to handle callback", errorDetails: error };
     }
   });
