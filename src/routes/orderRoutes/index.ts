@@ -1,4 +1,4 @@
-import { Elysia, t } from "elysia";
+import { Elysia, t, Context } from "elysia";
 import {
   createOrder,
   getOrders,
@@ -96,16 +96,22 @@ const orderRoutes = new Elysia({ prefix: "/order" })
       return { error: "Failed to create payment URL", errorDetails: error };
     }
   })
-  .post("/robokassa/callback", async ({ request, set }) => {
+  .post("/robokassa/callback", async (c: Context) => {
     try {
       return await new Promise(async (resolve, reject) => {
         robokassaHelper.handleResultUrlRequest(
-          request,
+          c.request,
           {
             setHeader: (header, value) => {
-              set.headers[header] = value;
+              c.set.headers[header] = value; // используем c.set.headers
             },
-            end: () => {},
+            end: async () => {
+              try {
+                c.set.status = 200; // Устанавливаем статус 200 OK
+              } catch (err) {
+                reject(new Error("Failed to set response status: " + err));
+              }
+            },
           },
           async (values, userData: UserData) => {
             console.log({
@@ -120,7 +126,6 @@ const orderRoutes = new Elysia({ prefix: "/order" })
             }
             try {
               await updateOrderStatus(orderId, "InProgress");
-              resolve({ message: "ok" });
             } catch (error) {
               reject(new Error("Failed to update order status" + error));
             }
@@ -128,7 +133,8 @@ const orderRoutes = new Elysia({ prefix: "/order" })
         );
       });
     } catch (error) {
-      return { error: "Failed to handle callback", errorDetails: error };
+      c.set.status = 500;
+      return c.error(500);
     }
   });
 
