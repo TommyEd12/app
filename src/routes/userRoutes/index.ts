@@ -100,7 +100,7 @@ export const userRoutes = new Elysia({ prefix: "/user" })
           }),
           httpOnly: true,
           maxAge: 7 * 86400,
-          domain: "musandco.ru",
+          domain: "localhost:5000",
           path: "/",
         });
         return {
