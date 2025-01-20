@@ -96,7 +96,7 @@ const orderRoutes = new Elysia({ prefix: "/order" })
     robokassaHelper.handleResultUrlRequest(
       request,
       set,
-      function (values, userData) {
+      async function (values, userData) {
         console.log({
           values: values, // Will contain general values like "invId" and "outSum"
           userData: userData, // Will contain all your custom data passed previously, e.g.: "productId"
