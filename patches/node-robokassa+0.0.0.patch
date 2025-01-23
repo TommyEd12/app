@@ -1,0 +1,14 @@
+diff --git a/node_modules/node-robokassa/src/RobokassaHelper.js b/node_modules/node-robokassa/src/RobokassaHelper.js
+index 7c06537..1112051 100644
+--- a/node_modules/node-robokassa/src/RobokassaHelper.js
++++ b/node_modules/node-robokassa/src/RobokassaHelper.js
+@@ -179,7 +179,8 @@ class RobokassaHelper {
+         }
+       });
+     } catch (error) {
+-      res.status(400).send(error.message);
++      res.status = 400;
++      console.log(error)
+       return;
+     }
+ 

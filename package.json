@@ -2,6 +2,7 @@
   "name": "app",
   "version": "1.0.50",
   "scripts": {
+    "postinstall": "patch-package",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
     "email": "email dev --dir src/emails"
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "bun-types": "latest",
+    "patch-package": "^8.0.0",
     "react-email": "^3.0.3"
   },
   "module": "src/index.js"

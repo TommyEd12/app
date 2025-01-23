@@ -101,18 +101,7 @@ const orderRoutes = new Elysia({ prefix: "/order" })
       return await new Promise(async (resolve, reject) => {
         robokassaHelper.handleResultUrlRequest(
           c.request,
-          {
-            setHeader: (header, value) => {
-              c.set.headers[header] = value; // используем c.set.headers
-            },
-            end: async () => {
-              try {
-                c.set.status = 200; // Устанавливаем статус 200 OK
-              } catch (err) {
-                reject(new Error("Failed to set response status: " + err));
-              }
-            },
-          },
+          c.set,
           async (values, userData: UserData) => {
             console.log({
               values: values,
@@ -130,6 +119,17 @@ const orderRoutes = new Elysia({ prefix: "/order" })
               reject(new Error("Failed to update order status" + error));
             }
           }
+          // {
+          //   setHeader: (header, value) => {
+          //     c.set.headers[header] = value; // используем c.set.headers
+          //   },
+          //   end: async () => {
+          //     try {
+          //     } catch (err) {
+          //       reject(new Error("Failed to set response status: " + err));
+          //     }
+          //   },
+          // },
         );
       });
     } catch (error) {
