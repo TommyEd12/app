@@ -97,8 +97,11 @@ const orderRoutes = new Elysia({ prefix: "/order" })
     }
   })
   .post("/robokassa/callback", async (c: Context) => {
+    console.log(c.query)
+    console.log(c.params)
     try {
       return await new Promise(async (resolve, reject) => {
+        
         robokassaHelper.handleResultUrlRequest(
           c.request,
           c.set,
@@ -118,7 +121,8 @@ const orderRoutes = new Elysia({ prefix: "/order" })
             } catch (error) {
               reject(new Error("Failed to update order status" + error));
             }
-          }
+          },
+          c.params
           // {
           //   setHeader: (header, value) => {
           //     c.set.headers[header] = value; // используем c.set.headers
