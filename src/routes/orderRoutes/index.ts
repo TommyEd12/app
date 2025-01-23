@@ -99,6 +99,7 @@ const orderRoutes = new Elysia({ prefix: "/order" })
   .post("/robokassa/callback", async (c: Context) => {
     console.log(c.query)
     console.log(c.params)
+    console.log(JSON.stringify(c, undefined, 2))
     try {
       return await new Promise(async (resolve, reject) => {
         
