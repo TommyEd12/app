@@ -96,7 +96,7 @@ const orderRoutes = new Elysia({ prefix: "/order" })
       return { error: "Failed to create payment URL", errorDetails: error };
     }
   })
-  .post("/robokassa/callback", async (c: Context) => {
+  .get("/robokassa/callback", async (c: Context) => {
     console.log(c.query);
     console.log(c.params);
     console.log(JSON.stringify(c, undefined, 2));
@@ -122,13 +122,7 @@ const orderRoutes = new Elysia({ prefix: "/order" })
               reject(new Error("Failed to update order status" + error));
             }
           },
-          {
-            OutSum: "20000",
-            invDesc: "1vwev",
-            options: {
-              orderId: "1",
-            },
-          }
+          c.query
           // {
           //   setHeader: (header, value) => {
           //     c.set.headers[header] = value; // используем c.set.headers
