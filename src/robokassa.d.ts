@@ -7,7 +7,7 @@ declare module "node-robokassa" {
       password1: string;
       password2: string;
       testMode?: boolean;
-      resultUrlRequestMethod?: "POST" | "GET";
+      resultUrlRequestMethod?: "GET" | "POST";
     });
 
     generatePaymentUrl(outSum: number, invDesc: string, options: any): string;

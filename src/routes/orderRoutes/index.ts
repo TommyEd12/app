@@ -77,15 +77,15 @@ const orderRoutes = new Elysia({ prefix: "/order" })
     }
   )
   .post("/create-payment", async ({ body, set }) => {
-    const { outSum, invDesc, options } = body as {
-      outSum: number;
+    const { OutSum, invDesc, options } = body as {
+      OutSum: number;
       invDesc: string;
       options: any;
     };
 
     try {
       const paymentUrl = robokassaHelper.generatePaymentUrl(
-        outSum,
+        OutSum,
         invDesc,
         options
       );
@@ -123,7 +123,7 @@ const orderRoutes = new Elysia({ prefix: "/order" })
             }
           },
           {
-            outSum: "20000",
+            OutSum: "20000",
             invDesc: "1vwev",
             options: {
               orderId: "1",
