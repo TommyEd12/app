@@ -1,8 +1,8 @@
 diff --git a/node_modules/node-robokassa/src/RobokassaHelper.js b/node_modules/node-robokassa/src/RobokassaHelper.js
-index 7c06537..05179ce 100644
+index 7c06537..1b09ae5 100644
 --- a/node_modules/node-robokassa/src/RobokassaHelper.js
 +++ b/node_modules/node-robokassa/src/RobokassaHelper.js
-@@ -157,7 +157,7 @@ class RobokassaHelper {
+@@ -157,17 +157,18 @@ class RobokassaHelper {
      let data = {};
      switch (method.toUpperCase()) {
        case 'GET':
@@ -10,8 +10,12 @@ index 7c06537..05179ce 100644
 +        data = options;
          break;
        case 'POST':
-         data = req.body;
-@@ -167,7 +167,7 @@ class RobokassaHelper {
+-        data = req.body;
++        data = options;
+         break;
+     }
++    console.log(options)
+ 
      // Validating and parsing request.
      let values = {};
      try {
@@ -20,7 +24,7 @@ index 7c06537..05179ce 100644
        _.forEach(keys, (required, key) => {
          const value = data[key];
          if (!value && required) {
-@@ -179,7 +179,8 @@ class RobokassaHelper {
+@@ -179,7 +180,8 @@ class RobokassaHelper {
          }
        });
      } catch (error) {
