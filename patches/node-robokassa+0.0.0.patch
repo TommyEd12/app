@@ -1,32 +1,13 @@
 diff --git a/node_modules/node-robokassa/src/RobokassaHelper.js b/node_modules/node-robokassa/src/RobokassaHelper.js
-index 7c06537..05179ce 100644
+index 05179ce..7506d26 100644
 --- a/node_modules/node-robokassa/src/RobokassaHelper.js
 +++ b/node_modules/node-robokassa/src/RobokassaHelper.js
-@@ -157,7 +157,7 @@ class RobokassaHelper {
-     let data = {};
-     switch (method.toUpperCase()) {
-       case 'GET':
--        data = req.query;
-+        data = options;
+@@ -164,7 +164,7 @@ class RobokassaHelper {
          break;
-       case 'POST':
-         data = req.body;
-@@ -167,7 +167,7 @@ class RobokassaHelper {
-     // Validating and parsing request.
-     let values = {};
-     try {
--      const keys = (options.keys || this.config.resultUrlKeys);
-+      const keys = (Object.keys(options) || this.config.resultUrlKeys);
-       _.forEach(keys, (required, key) => {
-         const value = data[key];
-         if (!value && required) {
-@@ -179,7 +179,8 @@ class RobokassaHelper {
-         }
-       });
-     } catch (error) {
--      res.status(400).send(error.message);
-+      res.status = 400;
-+      console.log(error)
-       return;
      }
  
+-    // Validating and parsing request.
++    // Validating and parsing request t.
+     let values = {};
+     try {
+       const keys = (Object.keys(options) || this.config.resultUrlKeys);
