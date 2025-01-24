@@ -1,8 +1,8 @@
 diff --git a/node_modules/node-robokassa/src/RobokassaHelper.js b/node_modules/node-robokassa/src/RobokassaHelper.js
-index 7c06537..b633da2 100644
+index 7c06537..d3f036a 100644
 --- a/node_modules/node-robokassa/src/RobokassaHelper.js
 +++ b/node_modules/node-robokassa/src/RobokassaHelper.js
-@@ -154,23 +154,24 @@ class RobokassaHelper {
+@@ -154,32 +154,31 @@ class RobokassaHelper {
      const method = (options.requestMethod || this.config.resultUrlRequestMethod);
  
      // Selecting request data object according to request method.
@@ -29,11 +29,11 @@ index 7c06537..b633da2 100644
 +      _.forEach(keys, ( key) => {
          const value = data[key];
 -        if (!value && required) {
-+        if (!value) {
-           throw new Error('Missing required key: ' + key);
-         }
+-          throw new Error('Missing required key: ' + key);
+-        }
          if (value) {
-@@ -179,7 +180,8 @@ class RobokassaHelper {
+           const normKey = _.camelCase(key);
+           values[normKey] = value;
          }
        });
      } catch (error) {
