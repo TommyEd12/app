@@ -1,9 +1,13 @@
 diff --git a/node_modules/node-robokassa/src/RobokassaHelper.js b/node_modules/node-robokassa/src/RobokassaHelper.js
-index 7c06537..1b09ae5 100644
+index 7c06537..62fc39e 100644
 --- a/node_modules/node-robokassa/src/RobokassaHelper.js
 +++ b/node_modules/node-robokassa/src/RobokassaHelper.js
-@@ -157,17 +157,18 @@ class RobokassaHelper {
-     let data = {};
+@@ -154,20 +154,21 @@ class RobokassaHelper {
+     const method = (options.requestMethod || this.config.resultUrlRequestMethod);
+ 
+     // Selecting request data object according to request method.
+-    let data = {};
++    let data = options;
      switch (method.toUpperCase()) {
        case 'GET':
 -        data = req.query;
