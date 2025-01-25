@@ -109,8 +109,8 @@ const orderRoutes = new Elysia({ prefix: "/order" })
             console.log(
               "myData" +
                 {
-                  values: values,
-                  userData: userData,
+                  values: JSON.stringify(values),
+                  userData: JSON.stringify(userData),
                 }
             );
             const orderId = userData?.orderId;
