@@ -106,10 +106,13 @@ const orderRoutes = new Elysia({ prefix: "/order" })
           c.request,
           c.set,
           async (values, userData: UserData) => {
-            console.log({
-              values: values,
-              userData: userData,
-            });
+            console.log(
+              "myData" +
+                {
+                  values: values,
+                  userData: userData,
+                }
+            );
             const orderId = userData?.orderId;
 
             if (!orderId) {
