@@ -108,10 +108,10 @@ const orderRoutes = new Elysia({ prefix: "/order" })
           async (values, userData: UserData) => {
             console.log(
               "myData" +
-                {
+                JSON.stringify({
                   values: JSON.stringify(values),
                   userData: JSON.stringify(userData),
-                }
+                })
             );
             const orderId = userData?.orderId;
 
