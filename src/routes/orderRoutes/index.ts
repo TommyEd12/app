@@ -130,7 +130,7 @@ const orderRoutes = new Elysia({ prefix: "/order" })
                   userData: JSON.stringify(userData),
                 })
             );
-            const html = renderToStaticMarkup(orderEmail(values.OutSumm));
+            const html = renderToStaticMarkup(orderEmail(values.outSumm));
             const orderId = userData?.orderId;
             const userEmail = userData?.userEmail;
             const mailOptions = {
