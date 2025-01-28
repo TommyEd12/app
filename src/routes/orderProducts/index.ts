@@ -1,8 +1,7 @@
 import { Elysia, t } from "elysia";
 import { db } from "../../db";
-import { orderProducts, ordersTable } from "../../db/schema";
+import { orderProducts, ordersTable, productsTable } from "../../db/schema";
 import { eq } from "drizzle-orm";
-
 
 const orderProductsRoutes = new Elysia({ prefix: "/orderProducts" })
   .get(
@@ -12,8 +11,11 @@ const orderProductsRoutes = new Elysia({ prefix: "/orderProducts" })
         .select({
           productId: orderProducts.productId,
           quantity: orderProducts.quantity,
+          name: productsTable.name,
+          price: productsTable.price,
         })
         .from(orderProducts)
+        .leftJoin(productsTable, eq(productsTable.id, orderProducts.productId))
         .where(eq(orderProducts.orderId, orderId));
       return products;
     },

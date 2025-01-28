@@ -12,6 +12,7 @@ import jwt from "@elysiajs/jwt";
 import { renderToStaticMarkup } from "react-dom/server";
 import orderEmail from "../../emails/orderEmail";
 import { sendEmail } from "../../utils/sendEmail";
+import { calculateSumm } from "../../utils/calculateSumm";
 
 interface UserData {
   orderId: number;
@@ -81,7 +82,7 @@ const orderRoutes = new Elysia({ prefix: "/order" })
     }
   )
   .post("/create-payment", async ({ body, set }) => {
-    const { OutSum, invDesc, options } = body as {
+    let { OutSum, invDesc, options } = body as {
       OutSum: number;
       invDesc: string;
       options: {
@@ -91,6 +92,13 @@ const orderRoutes = new Elysia({ prefix: "/order" })
         };
       };
     };
+    OutSum = (await calculateSumm(options.userData.orderId)).reduce(
+      (sum, item) => {
+        const value = item.price!;
+        return sum + item.quantity * value;
+      },
+      0
+    );
 
     try {
       const paymentUrl = robokassaHelper.generatePaymentUrl(
@@ -122,10 +130,9 @@ const orderRoutes = new Elysia({ prefix: "/order" })
                   userData: JSON.stringify(userData),
                 })
             );
-            const html = renderToStaticMarkup(orderEmail(values.OutSum));
+            const html = renderToStaticMarkup(orderEmail(values.OutSumm));
             const orderId = userData?.orderId;
             const userEmail = userData?.userEmail;
-            console.log("newData" + orderId, userEmail);
             const mailOptions = {
               from: Bun.env.AUTH_EMAIL!,
               to: userEmail,

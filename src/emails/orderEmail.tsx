@@ -12,8 +12,8 @@ export default function orderEmail( outSum: number ) {
           <Text className="text-gray-500 my-0">
             Ваш заказ обработан, сумма заказа представлена ниже:
           </Text>
-          <Text className="text-5xl font-bold pt-2">{outSum}</Text>
-          <Text className="text-gray-400 font-light text-xs pb-4">
+          <Text className="text-5xl font-bold pt-2">{outSum}₽</Text>
+          <Text className="text-gray-500 font-light text-xs pb-4">
             В скором времени с вами свяжется наш менеджер для уточнения информации о доствке
           </Text>
           <Text className="text-gray-600 text-xs">Спасибо за использование нашего сервиса!</Text>
