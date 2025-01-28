@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Tailwind, Section, Text } from "@react-email/components";
 
-export default function OTPEmail( outSum: number ) {
+export default function orderEmail( outSum: number ) {
   return (
     <Tailwind>
       <Section className="flex justify-center items-center w-full min-h-screen font-sans">
@@ -22,7 +22,3 @@ export default function OTPEmail( outSum: number ) {
     </Tailwind>
   );
 }
-
-OTPEmail.PreviewProps = {
-  otp: 123456,
-};

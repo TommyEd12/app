@@ -9,9 +9,13 @@ import cookie from "@elysiajs/cookie";
 import robokassa from "node-robokassa";
 import { updateOrderStatus } from "../../utils/updateOrderStatus";
 import jwt from "@elysiajs/jwt";
+import { renderToStaticMarkup } from "react-dom/server";
+import orderEmail from "../../emails/orderEmail";
+import { sendEmail } from "../../utils/sendEmail";
 
 interface UserData {
   orderId: number;
+  userEmail: string;
 }
 
 const robokassaHelper = new robokassa.RobokassaHelper({
@@ -83,6 +87,7 @@ const orderRoutes = new Elysia({ prefix: "/order" })
       options: {
         userData: {
           orderId: number;
+          userEmail: string;
         };
       };
     };
@@ -117,7 +122,16 @@ const orderRoutes = new Elysia({ prefix: "/order" })
                   userData: JSON.stringify(userData),
                 })
             );
+            const html = renderToStaticMarkup(orderEmail(values.OutSum));
             const orderId = userData?.orderId;
+            const userEmail = userData?.userEmail;
+            const mailOptions = {
+              from: Bun.env.AUTH_EMAIL!,
+              to: userEmail,
+              subject: "Ваш заказ",
+              html,
+            };
+            await sendEmail(mailOptions);
 
             if (!orderId) {
               reject(new Error("Order id not found in callback data"));
