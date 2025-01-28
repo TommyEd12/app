@@ -125,6 +125,7 @@ const orderRoutes = new Elysia({ prefix: "/order" })
             const html = renderToStaticMarkup(orderEmail(values.OutSum));
             const orderId = userData?.orderId;
             const userEmail = userData?.userEmail;
+            console.log("newData" + orderId, userEmail);
             const mailOptions = {
               from: Bun.env.AUTH_EMAIL!,
               to: userEmail,
