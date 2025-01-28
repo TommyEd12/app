@@ -35,12 +35,16 @@ export async function createOrder(options: {
 }) {
   try {
     const { userId, status, address, postIndex } = options;
-    await db.insert(ordersTable).values({
-      userId: userId,
-      status: status,
-      address: address,
-      postIndex: postIndex,
-    });
+    const newRecord = await db
+      .insert(ordersTable)
+      .values({
+        userId: userId,
+        status: status,
+        address: address,
+        postIndex: postIndex,
+      })
+      .returning({ id: ordersTable.id });
+    return newRecord[0].id;
   } catch (e: unknown) {
     console.log(`Error creating order:${e}`);
   }

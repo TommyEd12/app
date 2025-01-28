@@ -45,27 +45,27 @@ const orderRoutes = new Elysia({ prefix: "/order" })
 
   .post(
     "/",
-    ({ body: { userId, status: statusBody, address, postIndex } }) => {
+    async ({ body: { userId, status: statusBody, address, postIndex } }) => {
       const validStatuses: status[] = ["Created", "InProgress", "Finished"];
       if (!validStatuses.includes(statusBody as status)) {
         throw new Error("Invalid status value");
       }
 
       try {
-        createOrder({
+        const orderId = await createOrder({
           userId,
           status: statusBody as status,
           address,
           postIndex,
         });
+        return {
+          success: true,
+          data: orderId,
+          message: "Created successfully",
+        };
       } catch (error) {
         return error;
       }
-      return {
-        success: true,
-        data: statusBody,
-        message: "Created successfully",
-      };
     },
     {
       body: t.Object({
@@ -80,7 +80,11 @@ const orderRoutes = new Elysia({ prefix: "/order" })
     const { OutSum, invDesc, options } = body as {
       OutSum: number;
       invDesc: string;
-      options: any;
+      options: {
+        userData: {
+          orderId: number;
+        };
+      };
     };
 
     try {
