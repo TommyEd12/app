@@ -24,7 +24,7 @@ const robokassaHelper = new robokassa.RobokassaHelper({
   hashingAlgorithm: "MD5",
   password1: "egor0827",
   password2: "egor08273",
-  testMode: true, // Set test mode as needed
+  testMode: false, // Set test mode as needed
   resultUrlRequestMethod: "POST",
 });
 
